@@ -35,6 +35,8 @@ function getFileStream (bucketName, fileName) {
 
 exports.appendFiles = function appendFiles (req, res) {
   try {
+    console.log("hola!!!");
+
      var id = req.body.id;
      var dateFrom = req.body.dateFrom;
      var days = req.body.days;
