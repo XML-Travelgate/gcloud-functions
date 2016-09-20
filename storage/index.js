@@ -39,6 +39,7 @@ exports.appendFiles = function appendFiles (req, res) {
      var date = req.query.date;
      var days = req.query.days;
      var bucketName = req.query.bucketName;
+     var fileName = req.query.fileName;
    
      console.log("id:" + id + ",date:" + date + ",days" + days, ",bucketName:"+bucketName)
     if (id === undefined || id != 'mypass') {
@@ -48,7 +49,8 @@ exports.appendFiles = function appendFiles (req, res) {
       // Everything is ok
       console.log("Returning file");
       res.attachment("billing.csv");
-      getFileStream( "xtg-billing", "billing_gcloud_content-2016-09-14.csv").pipe(res);
+    //  getFileStream( "xtg-billing", "billing_gcloud_content-2016-09-14.csv").pipe(res);
+      getFileStream( "xtg-bq-export", "daf946fafdb74ca580a110187fdfeff3/TTHOT/avail_transposed_7days.csv").pipe(res);
     }
   } catch (err) {
     context.failure(err.message);
