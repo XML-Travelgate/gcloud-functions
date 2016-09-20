@@ -37,9 +37,9 @@ exports.appendFiles = function appendFiles (req, res) {
   try {
     console.log("hola!!!");
 
-     var id = req.body.id;
-     var dateFrom = req.body.dateFrom;
-     var days = req.body.days;
+     var id = req.params.id;
+     var dateFrom = req.params.dateFrom;
+     var days = req.params.days;
    
      console.log("id:" + id + ",dateFrom:" + dateFrom + ",days" + days)
 
