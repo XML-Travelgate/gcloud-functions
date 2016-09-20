@@ -35,14 +35,18 @@ function getFileStream (bucketName, fileName) {
 
 exports.appendFiles = function appendFiles (req, res) {
   try {
-     console.log("RequestMethod:" + req.method)
+     var id = req.body.id;
+     var dateFrom = req.body.dateFrom;
+     var days = req.body.days;
+   
+     console.log("id:" + id + ",dateFrom:" + dateFrom + ",days" + days)
 
-    if (req.body.message === undefined || req.method != 'GET' ) {
+    if (id === undefined) {
         // This is an error case, as "message" is required
         res.status(400).send('Request message error');
     } else {
       // Everything is ok
-      console.log(req.body.message);
+      console.log("OK");
       res.status(200).end();
     }
   } catch (err) {
