@@ -33,6 +33,8 @@ function getFileStream (bucketName, fileName) {
   return bucket.file(fileName).createReadStream();
 }
 
+
+//streaming version
 exports.appendFiles = function appendFiles (req, res) {
   try {
      var id = req.query.id;
@@ -40,23 +42,36 @@ exports.appendFiles = function appendFiles (req, res) {
      var days = req.query.days;
      var bucketName = req.query.bucketName;
      var fileName = req.query.fileName;
+     var redirect = req.query.redirect;
    
-     console.log("id:" + id + ",date:" + date + ",days" + days, ",bucketName:"+bucketName)
+     console.log("id:" + id + ",date:" + date + ",days" + days, ",bucketName:"+bucketName, ",fileName:"+fileName)
     if (id === undefined || id != 'mypass') {
         // This is an error case, as "message" is required
         res.status(400).send('Invalid Id');
     } else {
       // Everything is ok
-      console.log("Returning file");
-      res.attachment("billing.csv");
-      //getFileStream( "xtg-billing", fileName).pipe(res);
-      getFileStream( bucketName, fileName).pipe(res);
-      //getFileStream( "xtg-bq-export", "daf946fafdb74ca580a110187fdfeff3/TTHOT/avail_transposed_7days.csv").pipe(res);
+      console.log("Returning file: " + redirect );
+      if (redirect){
+        res.writeHead(302, {
+              'Location': 'https://storage.googleapis.com/xtg-billing/avail_transposed_7days.csv'
+              //add other headers here...
+        });
+        res.end();
+
+
+      }else{
+        res.attachment("billing.csv");
+        //getFileStream( "xtg-billing", fileName).pipe(res);
+        getFileStream( bucketName, fileName).pipe(res);
+        //getFileStream( "xtg-bq-export", "daf946fafdb74ca580a110187fdfeff3/TTHOT/avail_transposed_7days.csv").pipe(res);
+
+      }
     }
   } catch (err) {
     context.failure(err.message);
   }
 }
+
 
 exports.ping = function ping () {
  console.log("ping!!");
