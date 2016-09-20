@@ -35,21 +35,20 @@ function getFileStream (bucketName, fileName) {
 
 exports.appendFiles = function appendFiles (req, res) {
   try {
-    console.log("hola11!!!");
-
      var id = req.query.id;
-     var dateFrom = req.query.dateFrom;
+     var date = req.query.date;
      var days = req.query.days;
+     var bucketName = req.query.bucketName;
    
-     console.log("id:" + id + ",dateFrom:" + dateFrom + ",days" + days)
-
-    if (id === undefined) {
+     console.log("id:" + id + ",date:" + date + ",days" + days, ",bucketName:"+bucketName)
+    if (id === undefined || id != 'mypass') {
         // This is an error case, as "message" is required
-        res.status(400).send('Request message error');
+        res.status(400).send('Invalid Id');
     } else {
       // Everything is ok
-      console.log("OK");
-      res.status(200).end();
+      console.log("Returning file");
+      res.attachment("billing.csv");
+      getFileStream( "xtg-billing", "billing_gcloud_content-2016-09-14.csv").pipe(res).status(200).end();
     }
   } catch (err) {
     context.failure(err.message);
