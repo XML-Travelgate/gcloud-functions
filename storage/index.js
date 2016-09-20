@@ -49,7 +49,8 @@ exports.appendFiles = function appendFiles (req, res) {
       // Everything is ok
       console.log("Returning file");
       res.attachment("billing.csv");
-      getFileStream( "xtg-billing", "avail_transposed_7days.csv").pipe(res);
+      //getFileStream( "xtg-billing", fileName).pipe(res);
+      getFileStream( bucketName, fileName).pipe(res);
       //getFileStream( "xtg-bq-export", "daf946fafdb74ca580a110187fdfeff3/TTHOT/avail_transposed_7days.csv").pipe(res);
     }
   } catch (err) {
