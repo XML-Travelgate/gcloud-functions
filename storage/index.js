@@ -48,7 +48,7 @@ exports.appendFiles = function appendFiles (req, res) {
       // Everything is ok
       console.log("Returning file");
       res.attachment("billing.csv");
-      getFileStream( "xtg-billing", "billing_gcloud_content-2016-09-14.csv").pipe(res).status(200).end();
+      getFileStream( "xtg-billing", "billing_gcloud_content-2016-09-14.csv").pipe(res);
     }
   } catch (err) {
     context.failure(err.message);
