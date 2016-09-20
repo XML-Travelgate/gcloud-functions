@@ -34,6 +34,8 @@ function getFileStream (bucketName, fileName) {
 }
 
 
+
+
 //streaming version
 exports.appendFiles = function appendFiles (req, res) {
   try {
@@ -53,7 +55,7 @@ exports.appendFiles = function appendFiles (req, res) {
       console.log("Returning file: " + redirect );
       if (redirect){
         res.writeHead(302, {
-              'Location': 'https://storage.googleapis.com/xtg-billing/avail_transposed_7days.csv'
+              'Location': 'https://storage.googleapis.com/xtg-billing/'+fileName
               //add other headers here...
         });
         res.end();
