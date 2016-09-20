@@ -35,11 +35,11 @@ function getFileStream (bucketName, fileName) {
 
 exports.appendFiles = function appendFiles (req, res) {
   try {
-    console.log("hola!!!");
+    console.log("hola11!!!");
 
-     var id = req.params.id;
-     var dateFrom = req.params.dateFrom;
-     var days = req.params.days;
+     var id = req.query.id;
+     var dateFrom = req.query.dateFrom;
+     var days = req.query.days;
    
      console.log("id:" + id + ",dateFrom:" + dateFrom + ",days" + days)
 
