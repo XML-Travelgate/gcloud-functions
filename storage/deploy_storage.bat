@@ -1,1 +1,0 @@
-gcloud alpha functions deploy appendFiles --source-url https://source.developers.google.com/p/axiomatic-port-796/r/gcloud-functions --source-path "/storage" --trigger-http --source-branch master
