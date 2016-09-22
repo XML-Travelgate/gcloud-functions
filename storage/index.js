@@ -46,7 +46,7 @@ exports.appendFiles = function appendFiles (req, res) {
       });
 
   } catch (err) {
-    context.failure(err.message);
+    console.log(err.message);
   }
 }
 
