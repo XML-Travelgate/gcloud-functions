@@ -1,23 +1,12 @@
-// Copyright 2016, Google, Inc.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 'use strict';
 
-var Storage = require('@google-cloud/storage');
+const gcloud = require('google-cloud');
+const fast = require('fast-csv');
+const csv = require('csv-parse')
 
-var readline = require('readline');
+const gcs = gcloud.storage()
 
-function getFileStream (bucketName, fileName) {
+function getFile(bucketName, fileName) {
   if (!bucketName) {
     throw new Error('Bucket not provided. Make sure you have a ' +
       '"bucket" property in your request');
@@ -28,54 +17,91 @@ function getFileStream (bucketName, fileName) {
   }
 
   // Instantiate a storage client
-  var storage = Storage();
-  var bucket = storage.bucket(bucketName);
-  return bucket.file(fileName).createReadStream();
+  let bucket = gcs.bucket(bucketName);
+  return bucket.file(fileName)
 }
 
-
-
-
-//streaming version
 exports.appendFiles = function appendFiles (req, res) {
   try {
-     var id = req.query.id;
-     var date = req.query.date;
-     var days = req.query.days;
-     var bucketName = req.query.bucketName;
-     var fileName = req.query.fileName;
-     var redirect = req.query.redirect;
-   
-     console.log("id:" + id + ",date:" + date + ",days" + days, ",bucketName:"+bucketName, ",fileName:"+fileName)
-    if (id === undefined || id != 'mypass') {
-        // This is an error case, as "message" is required
-        res.status(400).send('Invalid Id');
-    } else {
-      // Everything is ok
-      console.log("Returning file: " + redirect );
-      if (redirect){
-        res.writeHead(302, {
-              'Location': 'https://storage.googleapis.com/xtg-billing/'+fileName
-              //add other headers here...
-        });
-        res.end();
+    const date = req.query.date
+    const days = req.query.days
+    const bucketName = req.query.bucketName
+    const prefix = req.query.prefix
 
+    let files = getFilesName(date, days, prefix);
+    getPromisesFiles(files, bucketName);
 
-      }else{
-        res.attachment("billing.csv");
-        //getFileStream( "xtg-billing", fileName).pipe(res);
-        getFileStream( bucketName, fileName).pipe(res);
-        //getFileStream( "xtg-bq-export", "daf946fafdb74ca580a110187fdfeff3/TTHOT/avail_transposed_7days.csv").pipe(res);
+    Promise.all(promises)
+      .then(values => {
+        let t = []
+        values.forEach((value, i) => {
+          if (i != 0) value.shift()
+          t = t.concat(value)
+        })
+        fast.writeToStream(res, t, {headers: false})
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(200).send(err)
+      });
 
-      }
-    }
   } catch (err) {
     context.failure(err.message);
   }
 }
 
+private function getPromisesFiles(files, bucketName){
+  files.forEach(file => {
+    let promise = new Promise((resolve, reject) => {
+
+      let file_bucket = getFileStream(bucketName, file)
+      const data = []
+
+
+      file_bucket.exists((err, exists) => {
+        if (!exists) reject(`file not found: ${file}`);
+      })
+
+      file_bucket.createReadStream()
+        .pipe(csv())
+        .on('data', (record) => data.push(record))
+        .on('error', (err) => reject(`err on file: ${file}`))
+        .on('end', () => {
+          resolve(data)
+        })
+    })
+    promises.push(promise)
+  });
+}
+
+private function getFilesName(init_date, days, prefix){
+  let date = init_date.split('-')
+  let day = date.pop()
+  let month = date.pop()
+  let year = date.pop()
+  let files = []
+
+
+  for(let i = 0; i < days; i++){
+    let d = day - i;
+
+    if (d < 0) {
+      d = 31;
+      month--;
+    }
+
+    if (month < 0) {
+      month = 12;
+      year--;
+    }
+
+    let file = `${prefix}${year}-${month}-${d}.csv`
+    files.push(file)
+  }
+
+  return files
+}
 
 exports.ping = function ping () {
  console.log("ping!!");
 }
-
