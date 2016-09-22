@@ -50,7 +50,7 @@ exports.appendFiles = function appendFiles (req, res) {
   }
 }
 
-private function getPromisesFiles(files, bucketName){
+function getPromisesFiles(files, bucketName){
   files.forEach(file => {
     let promise = new Promise((resolve, reject) => {
 
@@ -74,7 +74,7 @@ private function getPromisesFiles(files, bucketName){
   });
 }
 
-private function getFilesName(init_date, days, prefix){
+function getFilesName(init_date, days, prefix){
   let date = init_date.split('-')
   let day = date.pop()
   let month = date.pop()
