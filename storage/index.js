@@ -29,7 +29,7 @@ exports.appendFiles = function appendFiles (req, res) {
     const prefix = req.query.prefix
 
     let files = getFilesName(date, days, prefix);
-    getPromisesFiles(files, bucketName);
+    const promises = getPromisesFiles(files, bucketName);
 
     Promise.all(promises)
       .then(values => {
@@ -51,6 +51,7 @@ exports.appendFiles = function appendFiles (req, res) {
 }
 
 function getPromisesFiles(files, bucketName){
+  let p = []
   files.forEach(file => {
     let promise = new Promise((resolve, reject) => {
 
@@ -70,8 +71,9 @@ function getPromisesFiles(files, bucketName){
           resolve(data)
         })
     })
-    promises.push(promise)
+    p.push(promise)
   });
+  return p;
 }
 
 function getFilesName(init_date, days, prefix){
