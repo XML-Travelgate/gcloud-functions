@@ -55,7 +55,7 @@ function getPromisesFiles(files, bucketName){
   files.forEach(file => {
     let promise = new Promise((resolve, reject) => {
 
-      let file_bucket = getFileStream(bucketName, file)
+      let file_bucket = getFile(bucketName, file)
       const data = []
 
 
