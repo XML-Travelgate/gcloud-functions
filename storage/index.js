@@ -50,12 +50,17 @@ exports.appendFiles = function appendFiles (req, res) {
 exports.combineFiles = function combineFiles(req, res){
   try {
     const date = req.query.date || new Date().toISOString().slice(0, 10);
-    const days = req.query.days || 30
-    const prefix = req.query.prefix ||
-    const bucketName = req.query.bucket ||
-    const path = req.query.path ||
-    const export_path = req.query.export_path || 'tmp/'
+    const days = req.query.days || 30;
+    const prefix = req.query.prefix;
+    const bucketName = req.query.bucket;
+    const path = req.query.path;
+    const export_path = req.query.export_path || 'tmp/';
     const id_guid = guid();
+
+    if (!prefix || !bucketName) {
+      res.status(400).send('prefix or bucketName not defined');
+      return;
+    }
 
     bucket = gcs.bucket(bucketName);
     const files = getFiles(date, days, prefix, path);
