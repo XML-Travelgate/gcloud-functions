@@ -3,65 +3,110 @@
 const gcloud = require('google-cloud');
 const fast = require('fast-csv');
 const csv = require('csv-parse')
-
 const gcs = gcloud.storage()
 
-function getFile(bucketName, fileName) {
-  if (!bucketName) {
-    throw new Error('Bucket not provided. Make sure you have a ' +
-      '"bucket" property in your request');
-  }
-  if (!fileName) {
-    throw new Error('Filename not provided. Make sure you have a ' +
-      '"file" property in your request');
-  }
-
-  // Instantiate a storage client
-  let bucket = gcs.bucket(bucketName);
-  return bucket.file(fileName)
-}
-
+/**
+* Given a list of files combine the files without repeating the headers
+* and stream the result
+*/
 exports.appendFiles = function appendFiles (req, res) {
   try {
-    const date = req.query.date
-    const days = req.query.days
+    const date = req.query.date || new Date().toISOString().slice(0, 10);
+    const days = req.query.days || 30
     const bucketName = req.query.bucketName
     const prefix = req.query.prefix
 
-    let files = getFilesName(date, days, prefix);
-    const promises = getPromisesFiles(files, bucketName);
+    const files = getFiles(date, days, prefix, '', bucketName)
+    Pormise.all(files)
+    .then(data => {
+      const files = data.filter(file => file.found).map(x => x.fileName)
+      const promises = getDataPromisesFiles(files, bucketName);
 
-    Promise.all(promises)
-      .then(values => {
-        let t = []
-        values.forEach((value, i) => {
-          if (i != 0) value.shift()
-          t = t.concat(value)
+      Promise.all(promises)
+        .then(values => {
+          let t = []
+          values.forEach((value, i) => {
+            if (i != 0) value.shift()
+            t = t.concat(value)
+          })
+          fast.writeToStream(res, t, {headers: false})
         })
-        fast.writeToStream(res, t, {headers: false})
-      })
-      .catch(err => {
-        console.log(err)
-        res.status(200).send(err)
-      });
+        .catch(err => {
+          console.log(err)
+          res.status(200).send(err)
+        });
+
+    }).catch(err => console.log(err))
 
   } catch (err) {
     console.log(err.message);
   }
 }
 
-function getPromisesFiles(files, bucketName){
+/**
+* Combine list of files and save it in tmp folder with a guid name
+* (make it public) and redirects to the file
+*/
+exports.combineFiles = function combineFiles(req, res){
+  try {
+    const date = req.query.date || new Date().toISOString().slice(0, 10);
+    const days = req.query.days || 30
+    const prefix = req.query.prefix ||
+    const bucketName = req.query.bucket ||
+    const path = req.query.path ||
+    const export_path = req.query.export_path || 'tmp/'
+    const id_guid = guid();
+
+    bucket = gcs.bucket(bucketName);
+    const files = getFiles(date, days, prefix, path);
+
+    Promise.all(files).then((values) => {
+
+      values = values.filter(x => x.found).map(z => z.fileName)
+      let combinedFilesName = `${export_path}${id_guid}.csv`
+      let combinedFiles = bucket.file(combinedFilesName)
+      let bucket_files = values.map(f => bucket.file(f))
+
+      let promise = new Promise((resolve, reject) => {
+        bucket.combine(values, combinedFiles, (err, newFile, apiResponse) => {
+            if (err) reject(`err: ${err.message}`)
+            else resolve(newFile)});
+      });
+
+      promise
+      .then((data) => {
+        data.makePublic((err, apiResponse) => {
+          if (!err) {
+            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFilesName}`})
+            res.end()
+          }
+        })
+      })
+      .catch(err => console.log(err))
+
+    }).catch(err => console.log(err))
+
+  } catch(err) {
+    console.log(err)
+  }
+}
+
+/**
+* CSV Files ONLY - Given an array of files returns an array of promises that resolvs in
+* data from csv
+*
+* @method getDataPromisesFiles
+* @param {Array} files An array of files
+* @param {String} bucketName Name of bucket
+* @return {Array} Returns An array of promises that resolvs in data of each file
+*/
+function getDataPromisesFiles(files, bucketName){
   let p = []
   files.forEach(file => {
     let promise = new Promise((resolve, reject) => {
 
       let file_bucket = getFile(bucketName, file)
       const data = []
-
-
-      file_bucket.exists((err, exists) => {
-        if (!exists) reject(`file not found: ${file}`);
-      })
 
       file_bucket.createReadStream()
         .pipe(csv())
@@ -76,34 +121,74 @@ function getPromisesFiles(files, bucketName){
   return p;
 }
 
-function getFilesName(init_date, days, prefix){
-  let date = init_date.split('-')
-  let day = date.pop()
-  let month = date.pop()
-  let year = date.pop()
+/**
+* Method that returns an array of promises of files that resolve in
+* an object {fileName: fileName, found: boolean} given a starting date
+* and days beyond.
+*
+* @method getFiles
+* @param {String} init_date Initial date that we're looking for
+* @param {number} days Days beyond
+* @param {String} prefix Common name of file: Ex: 'billing_company_'
+* @param {String} path Path of file inside the bucket
+* @param {String} bucketName Name of bucket
+* @return {Array} Returns An array of promises that resolves in an
+* Object with fileName and found status ('boolean')
+*/
+function getFiles(init_date, days, prefix, path, bucketName){
   let files = []
 
 
   for(let i = 0; i < days; i++){
-    let d = day - i;
+    let date = new Date(init_date)
+    date.setDate(date.getDate() - i)
+    let time = date.toISOString().slice(0, 10)
 
-    if (d < 0) {
-      d = 31;
-      month--;
-    }
+    let fileName = `${path}${prefix}${time}.csv`
+    let file = getFile(bucketName, fileName)
 
-    if (month < 0) {
-      month = 12;
-      year--;
-    }
+    let p = new Promise((resolve, reject) => {
+      //we check if exists file
+      file.exists((err, exists) => {
+        if (err) console.log(err)
+        else if (exists) {
+          resolve({fileName: fileName, found: true})
+        }
+        resolve({fileName: fileName, found: false})
+      })
+    })
 
-    let file = `${prefix}${year}-${month}-${d}.csv`
-    files.push(file)
+    files.push(p)
+
   }
 
   return files
 }
 
-exports.ping = function ping () {
- console.log("ping!!");
+/**
+* Method to get a file from a Bucket
+*
+* @method getFile
+* @param {String} bucketName Name of bucket
+* @param {String} fileName Name of file
+* @return {File} Returns File Object
+*/
+function getFile(bucketName, fileName) {
+  let bucket = gcs.bucket(bucketName);
+  return bucket.file(fileName)
+}
+
+/**
+* Method to buid guid of 36 chars
+*
+* @method guid
+* @return {Boolean} Returns guid
+*/
+function guid() {
+  function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
