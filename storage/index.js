@@ -68,7 +68,9 @@ exports.combineFiles = function combineFiles(req, res){
     Promise.all(files).then((values) => {
 
       values = values.filter(x => x.found).map(z => z.fileName)
+      console.log(values)
       let combinedFilesName = `${export_path}${id_guid}.csv`
+      console.log(`export file: ${combinedFilesName}`)
       let combinedFiles = bucket.file(combinedFilesName)
       let bucket_files = values.map(f => bucket.file(f))
 
