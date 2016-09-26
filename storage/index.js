@@ -68,14 +68,13 @@ exports.combineFiles = function combineFiles(req, res){
     Promise.all(files).then((values) => {
 
       values = values.filter(x => x.found).map(z => z.fileName)
-      console.log(values)
       let combinedFilesName = `${export_path}${id_guid}.csv`
-      console.log(`export file: ${combinedFilesName}`)
       let combinedFiles = bucket.file(combinedFilesName)
       let bucket_files = values.map(f => bucket.file(f))
 
       let promise = new Promise((resolve, reject) => {
-        bucket.combine(values, combinedFiles, (err, newFile, apiResponse) => {
+        if (values.length === 0) reject(`not files found for ${date} in ${days} with prefix: ${prefix}`); return;
+        bucket.combine(bucket_files, combinedFiles, (err, newFile, apiResponse) => {
             if (err) reject(`err: ${err.message}`)
             else resolve(newFile)});
       });
@@ -89,13 +88,17 @@ exports.combineFiles = function combineFiles(req, res){
           }
         })
       })
-      .catch(err => console.log(err))
-
-    }).catch(err => console.log(err))
+      .catch(showError)
+    }).catch(showError)
 
   } catch(err) {
     console.log(err)
   }
+}
+
+function showError(error) {
+  console.log(err)
+  res.status(400).send(`error: ${err}`)
 }
 
 /**
