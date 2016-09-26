@@ -17,7 +17,7 @@ exports.appendFiles = function appendFiles (req, res) {
     const prefix = req.query.prefix
 
     const files = getFiles(date, days, prefix, '', bucketName)
-    Pormise.all(files)
+    Promise.all(files)
     .then(data => {
       const files = data.filter(file => file.found).map(x => x.fileName)
       const promises = getDataPromisesFiles(files, bucketName);
@@ -52,7 +52,7 @@ exports.combineFiles = function combineFiles(req, res){
     const date = req.query.date || new Date().toISOString().slice(0, 10);
     const days = req.query.days || 30;
     const prefix = req.query.prefix;
-    const bucketName = req.query.bucket;
+    const bucketName = req.query.bucketName;
     const path = req.query.path;
     const export_path = req.query.export_path || 'tmp/';
     const id_guid = guid();
@@ -62,8 +62,8 @@ exports.combineFiles = function combineFiles(req, res){
       return;
     }
 
-    bucket = gcs.bucket(bucketName);
-    const files = getFiles(date, days, prefix, path);
+    const bucket = gcs.bucket(bucketName);
+    const files = getFiles(date, days, prefix, path, bucketName);
 
     Promise.all(files).then((values) => {
 
