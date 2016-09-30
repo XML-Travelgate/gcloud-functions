@@ -67,14 +67,18 @@ exports.combineFiles = function combineFiles(req, res){
 
     Promise.all(files).then((values) => {
 
-      values = values.filter(x => x.found).map(z => z.fileName)
-      let combinedFilesName = `${export_path}${id_guid}.csv`
-      let combinedFiles = bucket.file(combinedFilesName)
-      let bucket_files = values.map(f => bucket.file(f))
+      console.log(files.filter(x => x.found))
+      const bucket_files = values
+                          .filter(x => x.found)
+                          .map(x => x.fileName)
+                          .map(f => bucket.file(f))
+      const combinedFileName = `${export_path}${id_guid}.csv`
+      console.log(`combiend file name: ${combinedFileName}`)
+      const combinedFile = bucket.file(combinedFileName)
 
       let promise = new Promise((resolve, reject) => {
         if (values.length === 0) reject(`not files found for ${date} in ${days} with prefix: ${prefix}`); return;
-        bucket.combine(bucket_files, combinedFiles, (err, newFile, apiResponse) => {
+        bucket.combine(bucket_files, combinedFile, (err, newFile, apiResponse) => {
             if (err) reject(`err: ${err.message}`)
             else resolve(newFile)});
       });
@@ -83,13 +87,20 @@ exports.combineFiles = function combineFiles(req, res){
       .then((data) => {
         data.makePublic((err, apiResponse) => {
           if (!err) {
-            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFilesName}`})
+            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}`})
             res.end()
           }
         })
       })
-      .catch(showError)
-    }).catch(showError)
+      .catch(
+        err => console.log(`error @Promise: ${err}`)
+        res.status(400).send(`error: ${err}`)
+      )
+
+    }).catch(
+      err => console.log(`error @Promises.all: ${err}`)
+      res.status(400).send(`error: ${err}`)
+    )
 
   } catch(err) {
     console.log(err)
