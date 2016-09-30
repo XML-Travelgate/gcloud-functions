@@ -67,10 +67,10 @@ exports.combineFiles = function combineFiles(req, res){
 
     Promise.all(files).then((values) => {
 
-      console.log(files.filter(x => x.found))
+      console.log(values.filter(x => x.found))
       const bucket_files = values
                           .filter(x => x.found)
-                          .map(x => x.fileName)
+                          .map(n => n.fileName)
                           .map(f => bucket.file(f))
       const combinedFileName = `${export_path}${id_guid}.csv`
       console.log(`combiend file name: ${combinedFileName}`)
@@ -168,6 +168,7 @@ function getFiles(init_date, days, prefix, path, bucketName){
     let time = date.toISOString().slice(0, 10)
 
     let fileName = `${path}${prefix}${time}.csv`
+    console.log(fileName)
     let file = getFile(bucketName, fileName)
 
     let p = new Promise((resolve, reject) => {
