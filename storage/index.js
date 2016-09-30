@@ -89,6 +89,9 @@ exports.combineFiles = function combineFiles(req, res){
           if (!err) {
             res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}`})
             res.end()
+          }else {
+            console.log(`error @makePublic: ${err}`);
+            res.status(400).send(`error: ${err}`);
           }
         })
       })
