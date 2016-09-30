@@ -93,17 +93,19 @@ exports.combineFiles = function combineFiles(req, res){
         })
       })
       .catch(
-        err => console.log(`error @Promise: ${err}`)
-        res.status(400).send(`error: ${err}`)
-      )
+        err => {
+        console.log(`error @Promise: ${err}`);
+        res.status(400).send(`error: ${err}`);
+      })
 
     }).catch(
-      err => console.log(`error @Promises.all: ${err}`)
-      res.status(400).send(`error: ${err}`)
-    )
+      err => {
+        console.log(`error @Promises.all: ${err}`);
+        res.status(400).send(`error: ${err}`);
+    })
 
   } catch(err) {
-    console.log(err)
+    console.log(`err general: ${err}`)
   }
 }
 
