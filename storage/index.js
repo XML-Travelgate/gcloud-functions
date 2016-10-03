@@ -67,15 +67,15 @@ exports.combineFiles = function combineFiles(req, res){
 
     Promise.all(files).then((values) => {
 
-      console.log(values.filter(x => x.found))
+      // console.log(values.filter(x => x.found))
       const bucket_files = values
                           .filter(x => x.found)
                           .map(n => n.fileName)
                           .map(f => bucket.file(f))
       const combinedFileName = `${export_path}${id_guid}.csv`
-      console.log(`combiend file name: ${combinedFileName} \nBucketFiles:`)
+      // console.log(`combiend file name: ${combinedFileName} \nBucketFiles:`)
       const combinedFile = bucket.file(combinedFileName)
-      console.log(bucket_files)
+      // console.log(bucket_files)
 
       let promise = new Promise((resolve, reject) => {
         if (bucket_files.length === 0) {
@@ -88,7 +88,7 @@ exports.combineFiles = function combineFiles(req, res){
               reject(`err: ${err.message}`);
               return;
             } else {
-              console.log(`we have new file: ${newFile}`)
+              // console.log(`we have new file: ${newFile}`)
               resolve(newFile);
             }
           });
@@ -98,8 +98,8 @@ exports.combineFiles = function combineFiles(req, res){
       .then((data) => {
         data.makePublic((err, apiResponse) => {
           if (!err) {
-            console.log(`url => https://storage.googleapis.com/${bucketName}/${combinedFileName}`)
-            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}.csv`})
+            // console.log(`url => https://storage.googleapis.com/${bucketName}/${combinedFileName}`)
+            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}`})
             res.end()
           }else {
             console.log(`error @makePublic: ${err}`);
@@ -183,7 +183,7 @@ function getFiles(init_date, days, prefix, path, bucketName){
     let time = date.toISOString().slice(0, 10)
 
     let fileName = `${path}${prefix}${time}.csv`
-    console.log(fileName)
+    // console.log(fileName)
     let file = getFile(bucketName, fileName)
 
     let p = new Promise((resolve, reject) => {
