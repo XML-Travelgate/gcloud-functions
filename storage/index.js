@@ -98,7 +98,7 @@ exports.combineFiles = function combineFiles(req, res){
       .then((data) => {
         data.makePublic((err, apiResponse) => {
           if (!err) {
-            console.log(`url => https://storage.googleapis.com/${bucketName}/${combinedFileName}.csv`)
+            console.log(`url => https://storage.googleapis.com/${bucketName}/${combinedFileName}`)
             res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}.csv`})
             res.end()
           }else {
