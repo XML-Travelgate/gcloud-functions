@@ -73,21 +73,33 @@ exports.combineFiles = function combineFiles(req, res){
                           .map(n => n.fileName)
                           .map(f => bucket.file(f))
       const combinedFileName = `${export_path}${id_guid}.csv`
-      console.log(`combiend file name: ${combinedFileName}`)
+      console.log(`combiend file name: ${combinedFileName} \nBucketFiles:`)
       const combinedFile = bucket.file(combinedFileName)
+      console.log(bucket_files)
 
       let promise = new Promise((resolve, reject) => {
-        if (values.length === 0) reject(`not files found for ${date} in ${days} with prefix: ${prefix}`); return;
+        if (bucket_files.length === 0) {
+          reject(`not files found for ${date} in ${days} with prefix: ${prefix}`);
+          return;
+        }
         bucket.combine(bucket_files, combinedFile, (err, newFile, apiResponse) => {
-            if (err) reject(`err: ${err.message}`)
-            else resolve(newFile)});
+            if (err) {
+              console.log(`err combine: ${err}`)
+              reject(`err: ${err.message}`);
+              return;
+            } else {
+              console.log(`we have new file: ${newFile}`)
+              resolve(newFile);
+            }
+          });
       });
 
       promise
       .then((data) => {
         data.makePublic((err, apiResponse) => {
           if (!err) {
-            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}`})
+            console.log(`url => https://storage.googleapis.com/${bucketName}/${combinedFileName}.csv`)
+            res.writeHead(302, {'Location':`https://storage.googleapis.com/${bucketName}/${combinedFileName}.csv`})
             res.end()
           }else {
             console.log(`error @makePublic: ${err}`);
