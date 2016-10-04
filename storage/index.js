@@ -55,6 +55,7 @@ exports.combineFiles = function combineFiles(req, res){
     const bucketName = req.query.bucketName;
     const path = req.query.path;
     const export_path = req.query.export_path || 'tmp/';
+    const header_file = req.query.header_file
     const id_guid = guid();
 
     if (!prefix || !bucketName) {
@@ -72,6 +73,7 @@ exports.combineFiles = function combineFiles(req, res){
                           .filter(x => x.found)
                           .map(n => n.fileName)
                           .map(f => bucket.file(f))
+      bucket_files.unshift(bucket.file(header_file))
       const combinedFileName = `${export_path}${id_guid}.csv`
       // console.log(`combiend file name: ${combinedFileName} \nBucketFiles:`)
       const combinedFile = bucket.file(combinedFileName)
