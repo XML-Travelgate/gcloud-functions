@@ -1,8 +1,7 @@
 'use strict';
 
 const gcloud = require('google-cloud');
-const fast = require('fast-csv');
-const csv = require('csv-parse')
+const csv = require('fast-csv');
 const gcs = gcloud.storage()
 
 /**
@@ -22,19 +21,19 @@ exports.appendFiles = function appendFiles (req, res) {
     .then(data => {
       const files = data.filter(file => file.found)
                         .map(x => x.fileName)
-      files.unshift(`billing_gcloud_content-header.csv`)
       const promises = getDataPromisesFiles(files, bucketName);
-
       Promise.all(promises)
-        .then(values => {
-          let rows = []
-          values.forEach((value, i) => {
-            value.shift() // We delete the headers
-            // add empty values for billings without credits stuff
-            rows = rows.length === 15 ? rows.splice(7, 0, '', 0, '') : rows;
-            rows = rows.concat(value)
+        .then(data => {
+          let headers = data.map(x => Object.getOwnPropertyNames(x[0])).reduce((pre, cur) => pre > cur ? pre : cur) // max headers
+          data.forEach(array => {
+            array.forEach(row => {
+              headers.forEach(header => {
+                if (row[header] == null) row[header] = ''; // fill empty cells
+              })
+            })
           })
-          fast.writeToStream(res, rows, {headers: false})
+          let tmp = [].concat(...data) // concat all rows
+          csv.writeToStream(res, tmp, {headers: true})
         })
         .catch(err => {
           console.log(err)
@@ -154,7 +153,7 @@ function getDataPromisesFiles(files, bucketName){
       const data = []
 
       file_bucket.createReadStream()
-        .pipe(csv())
+        .pipe(csv({objectMode: true, headers: true}))
         .on('data', (record) => data.push(record))
         .on('error', (err) => reject(`err on file: ${file}`))
         .on('end', () => {

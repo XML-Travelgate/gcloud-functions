@@ -9,7 +9,6 @@
     "test": "mocha -R spec -t 120000 --require intelli-espower-loader ./test/_setup.js test/*.test.js"
   },
   "dependencies": {
-    "csv-parse": "^1.1.7",
     "fast-csv": "^2.1.0",
     "google-cloud": "^0.40.0"
   },
