@@ -17,19 +17,24 @@ exports.appendFiles = function appendFiles (req, res) {
     const prefix = req.query.prefix
 
     const files = getFiles(date, days, prefix, '', bucketName)
+
     Promise.all(files)
     .then(data => {
-      const files = data.filter(file => file.found).map(x => x.fileName)
+      const files = data.filter(file => file.found)
+                        .map(x => x.fileName)
+      files.unshift(`billing_gcloud_content-header.csv`)
       const promises = getDataPromisesFiles(files, bucketName);
 
       Promise.all(promises)
         .then(values => {
-          let t = []
+          let rows = []
           values.forEach((value, i) => {
-            if (i != 0) value.shift()
-            t = t.concat(value)
+            value.shift() // We delete the headers
+            // add empty values for billings without credits stuff
+            rows = rows.length === 15 ? rows.splice(7, 0, '', 0, '') : rows;
+            rows = rows.concat(value)
           })
-          fast.writeToStream(res, t, {headers: false})
+          fast.writeToStream(res, rows, {headers: false})
         })
         .catch(err => {
           console.log(err)
