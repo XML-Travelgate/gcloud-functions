@@ -3,7 +3,7 @@ const await = require('asyncawait/await');
 const gcs = gcloud.storage()
 var bucket = null;
 
-exports.combineFilesv2 = function combineFiles(req, res) {
+exports.combineFiles = function combineFiles(req, res) {
 
 	const date = req.query.date || new Date();
 	const days = req.query.days || 30;

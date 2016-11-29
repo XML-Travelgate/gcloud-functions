@@ -1,17 +1,4 @@
-# Google Cloud Functions Node.js Samples Utils
+# Google Cloud Functions Node.js
 
-[Cloud Functions][functions_docs] is a lightweight, event-based, asynchronous
-compute solution that allows you to create small, single-purpose functions that
-respond to Cloud events without the need to manage a server or a runtime
-environment.
-
-## Setup
-
-1. Read [Prerequisites][prereq] and [How to run a sample][run] first.
-
-[prereq]: ../README.md#prerequisities
-[run]: ../README.md#how-to-run-a-sample
-
-## Utils
-
-* [Billing](billing/)
+1. `combineFiles` Combine multiple csv files from bucket and create & public the bundle. Async methodes.
+2. `appendFiles` WIP - refactoring
