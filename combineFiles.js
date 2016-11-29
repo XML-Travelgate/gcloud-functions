@@ -25,7 +25,10 @@ exports.combineFiles = function combineFiles(req, res) {
 	}
 
 	foo(date, days, path, prefix, bucketName, header_file)
-		.then(url => res.writeHead(302, { Location: url }))
+		.then(url => {
+			res.writeHead(302, {'Location':url});
+			res.end();
+		})
 		.catch(err => res.status(200).send(err))
 
 };
