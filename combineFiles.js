@@ -1,5 +1,6 @@
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
+const gcloud = require('google-cloud');
 const gcs = gcloud.storage()
 var bucket = null;
 
