@@ -1,5 +1,5 @@
-const ap = require('./appendFiles')
-const cb = require('./combineFiles')
+const af = require('./appendFiles')
+const cf = require('./combineFiles')
 
-exports.combineFiles = cb.combineFiles(res, req)
-exports.appendFiles = ap.appendFiles(res, req)
+exports.combineFiles = af.combineFiles(res, req)
+exports.appendFiles = cf.appendFiles(res, req)
