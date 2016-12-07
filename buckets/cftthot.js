@@ -4,15 +4,15 @@ const gcloud = require('google-cloud');
 const gcs = gcloud.storage()
 var bucket = null;
 
-exports.cftthot = function cftthot(req, res) {
+exports.cftthot = function cftthot(req, res, obj) {
 
-	const date = req.query.date || new Date();
-	const days = req.query.days || 10;
-	const prefix = req.query.prefix || 'confirm_'
-	let path = req.query.path || 'TTHOT/'
-	const bucketName = req.query.bucketName || 'xtg-bq-export'
-	const header_file = req.query.headerFile || 'Headers/headers_reservation.csv'
-	const stream = req.query.stream || false
+	const date = obj.date || new Date();
+	const days = obj.days || 10;
+	const prefix = obj.prefix;
+	let path = obj.path;
+	const bucketName = obj.bucketName;
+	const header_file = obj.headerFile;
+	const stream = obj.stream;
 
 	if (!prefix || !bucketName || !path || !header_file) {
 		res.status(400).send('prefix, path, bucketName, headerFile are mandatory');
