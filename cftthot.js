@@ -10,7 +10,7 @@ exports.cftthot = function cftthot(req, res) {
 	const days = req.query.days || 10;
 	const prefix = req.query.prefix || 'confirm_'
 	let path = req.query.path || 'TTHOT/'
-	const bucketName = req.query.bucketName || 'xtg-bg-export'
+	const bucketName = req.query.bucketName || 'xtg-bq-export'
 	const header_file = req.query.headerFile || 'Headers/headers_reservation.csv'
 	const stream = req.query.stream || true
 
