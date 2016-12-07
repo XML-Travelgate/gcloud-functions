@@ -12,7 +12,7 @@ exports.cftthot = function cftthot(req, res) {
 	let path = req.query.path || 'TTHOT/'
 	const bucketName = req.query.bucketName || 'xtg-bq-export'
 	const header_file = req.query.headerFile || 'Headers/headers_reservation.csv'
-	const stream = req.query.stream || true
+	const stream = req.query.stream || false
 
 	if (!prefix || !bucketName || !path || !header_file) {
 		res.status(400).send('prefix, path, bucketName, headerFile are mandatory');
