@@ -4,7 +4,7 @@ const gcloud = require('google-cloud');
 const gcs = gcloud.storage()
 var bucket = null;
 
-exports.cftthot = function cftthot(req, res, obj) {
+exports.basecf = function basecf(req, res, obj) {
 
 	const date = obj.date || new Date();
 	const days = obj.days || 10;
