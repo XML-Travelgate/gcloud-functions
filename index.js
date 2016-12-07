@@ -9,6 +9,7 @@ exports.tthotcancel = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, '
 exports.tthotavail = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'avail_', 'TTHOT/', 'Headers/headers_avail.csv')) 
 exports.tthotvaluation = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'valuation_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
 exports.tthotconfirm = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'confirm_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
+exports.tthotstats = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'stats_', 'TTHOT/', 'Headers/headers_stats.csv')) 
 
 
 function TransactionTypeObj(days, prefix, path, headerFile){
