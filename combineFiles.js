@@ -76,7 +76,7 @@ const foo =
 
 		let headers = bucket.file(header_file)
 		console.log("header file:", headers.name)
-		p.push(headers)
+		p.unshift(headers)
 		let finalFile = await(combine(p, `tmp/${guid()}.csv`))
 
 		console.log("name:", finalFile.name)
