@@ -28,14 +28,16 @@ exports.combineFiles = function combineFiles(req, res) {
 	foo(date, days, path, prefix, bucketName, header_file)
 		.then(file => {
 			if (stream) {
-				var stream = file.createReadStream();
-				stream.on('data', function (data) {
+				console.log('Data send method: Stream')
+				const fileStream = file.createReadStream();
+				fileStream.on('data', function (data) {
 					res.write(data);
 				});
-				stream.on('end', function () {
+				fileStream.on('end', function () {
 					res.end();
 				});
 			} else {
+				console.log('Data send method: Redirect')
 				const url = `https://storage.googleapis.com/${bucketName}/${file.name}`
 				res.writeHead(302, { 'Location': url });
 				res.end();
