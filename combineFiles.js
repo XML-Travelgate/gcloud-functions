@@ -12,6 +12,7 @@ exports.combineFiles = function combineFiles(req, res) {
 	let path = req.query.path;
 	const bucketName = req.query.bucketName;
 	const header_file = req.query.headerFile
+	const stream = req.query.stream || false
 
 	if (!prefix || !bucketName || !path || !header_file) {
 		res.status(400).send('prefix, path, bucketName, headerFile are mandatory');
@@ -25,9 +26,20 @@ exports.combineFiles = function combineFiles(req, res) {
 	}
 
 	foo(date, days, path, prefix, bucketName, header_file)
-		.then(url => {
-			res.writeHead(302, {'Location':url});
-			res.end();
+		.then(file => {
+			if (stream) {
+				var stream = file.createReadStream();
+				stream.on('data', function (data) {
+					res.write(data);
+				});
+				stream.on('end', function () {
+					res.end();
+				});
+			} else {
+				const url = `https://storage.googleapis.com/${bucketName}/${file.name}`
+				res.writeHead(302, { 'Location': url });
+				res.end();
+			}
 		})
 		.catch(err => res.status(200).send(err))
 
@@ -72,7 +84,7 @@ const foo =
 
 		const url = `https://storage.googleapis.com/${bucketName}/${finalFile.name}`
 		console.log('url:', url)
-		return url;
+		return finalFile;
 
 	})
 

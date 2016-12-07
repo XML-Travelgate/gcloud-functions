@@ -7,8 +7,11 @@
   "main": "./index.js",
   "scripts": {},
   "dependencies": {
+    "asyncawait": "^1.0.6",
     "fast-csv": "^2.1.0",
-    "google-cloud": "^0.40.0",
-    "asyncawait": "^1.0.6"
+    "google-cloud": "^0.40.0"
+  },
+  "devDependencies": {
+    "express": "^4.14.0"
   }
 }
