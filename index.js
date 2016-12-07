@@ -6,7 +6,7 @@ exports.combineFiles = cf.combineFiles
 exports.appendFiles = af.appendFiles
 
 exports.tthotcancel = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'cancel_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
-exports.tthotavail = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'avail_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
+exports.tthotavail = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'avail_', 'TTHOT/', 'Headers/headers_avail.csv')) 
 exports.tthotvaluation = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'valuation_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
 exports.tthotconfirm = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'confirm_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
 
