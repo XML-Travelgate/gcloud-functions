@@ -31,7 +31,7 @@ exports.cftthot = function cftthot(req, res) {
 				console.log('Data send method: Stream')
 				const fileStream = file.createReadStream();
 				fileStream.on('data', function (data) {
-					res.writeToStream(data);
+					res.write(data);
 				});
 				fileStream.on('end', function () {
 					res.end();
