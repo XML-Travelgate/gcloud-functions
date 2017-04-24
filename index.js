@@ -1,9 +1,11 @@
 const af = require('./appendFiles')
+const afV2 = require('/appendFilesV2')
 const cf = require('./combineFiles')
 const fn = require('./buckets/basecf')
 
 exports.combineFiles = cf.combineFiles
 exports.appendFiles = af.appendFiles
+exports.appendFilesV2 = afV2.appendFilesV2
 
 exports.tthotcancel = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'cancel_', 'TTHOT/', 'Headers/headers_reservation.csv')) 
 exports.tthotavail = (res, req) => fn.basecf(res, req, TransactionTypeObj(30, 'avail_', 'TTHOT/', 'Headers/headers_avail.csv')) 

@@ -1,4 +1,4 @@
 # Google Cloud Functions Node.js
 
-1. `combineFiles` Combine multiple csv files from bucket and create & public the bundle. Async methodes.
-2. `appendFiles` WIP - refactoring
+1. `combineFiles` Combine multiple csv files from bucket and create & public the combined file.
+2. `appendFilesV2` Combine on stream multiple CSV by bucket/prefix/date & days.
