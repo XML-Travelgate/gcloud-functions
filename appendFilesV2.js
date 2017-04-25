@@ -1,9 +1,9 @@
-// const gcs = require('@google-cloud/storage')();
+const gcs = require('@google-cloud/storage')();
 
-const gcs = require('@google-cloud/storage')({
-	projectId: 'axiomatic-port-796',
-	keyFilename: 'key-axiomatic.json'
-});
+// const gcs = require('@google-cloud/storage')({
+// 	projectId: 'axiomatic-port-796',
+// 	keyFilename: 'key-axiomatic.json'
+// });
 
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
